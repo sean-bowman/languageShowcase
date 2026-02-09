@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital Mechanics Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a1a;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #info-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(10, 20, 40, 0.9);
+            border: 1px solid #1e3a5f;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 100;
+            min-width: 280px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #info-panel h1 {
+            font-size: 1.2rem;
+            color: #4a90d9;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #1e3a5f;
+            padding-bottom: 10px;
+        }
+
+        .info-section {
+            margin-bottom: 15px;
+        }
+
+        .info-section h2 {
+            font-size: 0.9rem;
+            color: #6ab0ff;
+            margin-bottom: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+            font-size: 0.85rem;
+        }
+
+        .info-label {
+            color: #a0a0a0;
+        }
+
+        .info-value {
+            color: #e0e0e0;
+            font-family: 'Consolas', monospace;
+        }
+
+        .info-value.highlight {
+            color: #4a90d9;
+            font-weight: bold;
+        }
+
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(10, 20, 40, 0.9);
+            border: 1px solid #1e3a5f;
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 100;
+        }
+
+        #controls h2 {
+            font-size: 0.9rem;
+            color: #6ab0ff;
+            margin-bottom: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: #a0a0a0;
+            margin-bottom: 4px;
+        }
+
+        .control-group input[type="range"] {
+            width: 200px;
+            accent-color: #4a90d9;
+        }
+
+        .control-group input[type="number"] {
+            width: 100px;
+            background: #0d1b2a;
+            border: 1px solid #1e3a5f;
+            color: #e0e0e0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        button {
+            background: #1e3a5f;
+            color: #e0e0e0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 8px;
+            margin-top: 5px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #2e5a8f;
+        }
+
+        button.active {
+            background: #4a90d9;
+        }
+
+        #legend {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 20, 40, 0.9);
+            border: 1px solid #1e3a5f;
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 100;
+        }
+
+        #legend h2 {
+            font-size: 0.9rem;
+            color: #6ab0ff;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="info-panel">
+        <h1>Hohmann Transfer Visualization</h1>
+
+        <div class="info-section">
+            <h2>Initial Orbit (LEO)</h2>
+            <div class="info-row">
+                <span class="info-label">Altitude:</span>
+                <span class="info-value" id="initial-altitude">400 km</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Velocity:</span>
+                <span class="info-value" id="initial-velocity">7.67 km/s</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Period:</span>
+                <span class="info-value" id="initial-period">92.6 min</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Final Orbit (GEO)</h2>
+            <div class="info-row">
+                <span class="info-label">Altitude:</span>
+                <span class="info-value" id="final-altitude">35,786 km</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Velocity:</span>
+                <span class="info-value" id="final-velocity">3.07 km/s</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Period:</span>
+                <span class="info-value" id="final-period">24.0 hr</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Transfer Parameters</h2>
+            <div class="info-row">
+                <span class="info-label">First Burn (Dv1):</span>
+                <span class="info-value highlight" id="delta-v1">2.46 km/s</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Second Burn (Dv2):</span>
+                <span class="info-value highlight" id="delta-v2">1.48 km/s</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Total Delta-v:</span>
+                <span class="info-value highlight" id="total-delta-v">3.94 km/s</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Transfer Time:</span>
+                <span class="info-value" id="transfer-time">5.24 hr</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="controls">
+        <h2>Controls</h2>
+        <div class="control-group">
+            <label>Initial Altitude (km)</label>
+            <input type="number" id="input-initial" value="400" min="200" max="2000">
+        </div>
+        <div class="control-group">
+            <label>Final Altitude (km)</label>
+            <input type="number" id="input-final" value="35786" min="1000" max="100000">
+        </div>
+        <div class="control-group">
+            <label>Animation Speed</label>
+            <input type="range" id="speed-slider" min="0.1" max="5" step="0.1" value="1">
+        </div>
+        <div>
+            <button id="btn-calculate">Calculate Transfer</button>
+            <button id="btn-animate">Start Animation</button>
+            <button id="btn-reset">Reset View</button>
+        </div>
+    </div>
+
+    <div id="legend">
+        <h2>Legend</h2>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4a90d9;"></div>
+            <span>Initial Orbit</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4aff4a;"></div>
+            <span>Final Orbit</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ff9040;"></div>
+            <span>Transfer Orbit</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ff4040;"></div>
+            <span>Spacecraft</span>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

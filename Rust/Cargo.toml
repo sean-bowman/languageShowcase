@@ -1,0 +1,21 @@
+[package]
+name = "aerospace_units"
+version = "0.1.0"
+edition = "2021"
+description = "Type-safe aerospace unit conversion library - prevents unit errors at compile time"
+license = "MIT"
+authors = ["languageShowcase"]
+keywords = ["aerospace", "units", "type-safe", "conversion"]
+categories = ["aerospace", "science"]
+
+[dependencies]
+
+[dev-dependencies]
+
+[[example]]
+name = "rocket_equation"
+path = "examples/rocket_equation.rs"
+
+[[example]]
+name = "unit_demo"
+path = "examples/unit_demo.rs"

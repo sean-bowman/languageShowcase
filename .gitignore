@@ -1,0 +1,33 @@
+# Claude Code
+.claude/
+
+# Rust
+Rust/target/
+
+# C++ (CMake)
+C++/build/
+C++/build_test/
+
+# FORTRAN (FPM)
+FORTRAN/build/
+
+# C# / .NET
+C#/**/bin/
+C#/**/obj/
+PicoGK/**/bin/
+PicoGK/**/obj/
+
+# JavaScript
+Javascript/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+Manim/media/
+
+# PicoGK generated output
+PicoGK/Output/
+
+# OS files
+Thumbs.db
+.DS_Store

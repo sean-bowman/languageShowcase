@@ -1,0 +1,23 @@
+name = "isa_calculator"
+version = "0.1.0"
+license = "MIT"
+author = "languageShowcase"
+maintainer = ""
+copyright = "2024"
+
+[build]
+auto-executables = true
+auto-tests = true
+
+[library]
+source-dir = "src"
+
+[[executable]]
+name = "isa_calculator"
+source-dir = "app"
+main = "main.f90"
+
+[[test]]
+name = "test_isa"
+source-dir = "test"
+main = "test_isa.f90"

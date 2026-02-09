@@ -1,0 +1,246 @@
+<Window x:Class="AerospaceDashboard.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:AerospaceDashboard.ViewModels"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        Title="Aerospace Engineering Dashboard"
+        Height="800" Width="1200"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Style="{StaticResource PanelStyle}" Margin="5,5,5,10">
+            <StackPanel>
+                <TextBlock Text="Aerospace Engineering Dashboard"
+                           FontSize="24" FontWeight="Bold"
+                           Foreground="{StaticResource AccentBrush}"/>
+                <TextBlock Text="ISA Calculator | Hohmann Transfers | Unit Conversions"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Top Row: ISA and Hohmann Calculators -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ISA Calculator Panel -->
+            <Border Grid.Column="0" Style="{StaticResource PanelStyle}">
+                <StackPanel>
+                    <TextBlock Text="ISA Atmosphere Calculator" Style="{StaticResource HeaderStyle}"/>
+
+                    <TextBlock Text="Altitude (m)" Style="{StaticResource LabelStyle}"/>
+                    <TextBox Text="{Binding IsaAltitude, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,10"/>
+
+                    <Button Content="Calculate" Command="{Binding CalculateIsaCommand}"
+                            Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Results" Style="{StaticResource LabelStyle}"/>
+
+                    <Grid Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Altitude:"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding IsaResult.AltitudeKm, StringFormat={}{0:F2} km}"
+                                   Style="{StaticResource ValueStyle}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Temperature:"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding IsaResult.Temperature, StringFormat={}{0:F2} K}"
+                                   Style="{StaticResource ValueStyle}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Pressure:"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1"
+                                   Text="{Binding IsaResult.Pressure, StringFormat={}{0:E3} Pa}"
+                                   Style="{StaticResource ValueStyle}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Density:"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1"
+                                   Text="{Binding IsaResult.Density, StringFormat={}{0:E4} kg/m³}"
+                                   Style="{StaticResource ValueStyle}"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Speed of Sound:"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="1"
+                                   Text="{Binding IsaResult.SpeedOfSound, StringFormat={}{0:F2} m/s}"
+                                   Style="{StaticResource ValueStyle}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Hohmann Transfer Panel -->
+            <Border Grid.Column="1" Style="{StaticResource PanelStyle}">
+                <StackPanel>
+                    <TextBlock Text="Hohmann Transfer Calculator" Style="{StaticResource HeaderStyle}"/>
+
+                    <TextBlock Text="Initial Altitude (m)" Style="{StaticResource LabelStyle}"/>
+                    <TextBox Text="{Binding InitialAltitude, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,5"/>
+
+                    <TextBlock Text="Final Altitude (m)" Style="{StaticResource LabelStyle}"/>
+                    <TextBox Text="{Binding FinalAltitude, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,10"/>
+
+                    <Button Content="Calculate Transfer" Command="{Binding CalculateTransferCommand}"
+                            Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Transfer Parameters" Style="{StaticResource LabelStyle}"/>
+
+                    <Grid Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="First Burn (Dv1):"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding TransferResult.DeltaV1, StringFormat={}{0:F2} m/s}"
+                                   Style="{StaticResource ValueStyle}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Second Burn (Dv2):"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding TransferResult.DeltaV2, StringFormat={}{0:F2} m/s}"
+                                   Style="{StaticResource ValueStyle}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Delta-v:"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1"
+                                   Text="{Binding TransferResult.TotalDeltaV, StringFormat={}{0:F2} m/s}"
+                                   Style="{StaticResource ValueStyle}" FontWeight="Bold"
+                                   Foreground="{StaticResource AccentBrush}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Transfer Time:"
+                                   Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1"
+                                   Text="{Binding TransferResult.TransferTimeHours, StringFormat={}{0:F2} hours}"
+                                   Style="{StaticResource ValueStyle}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Unit Converter Panel -->
+            <Border Grid.Column="2" Style="{StaticResource PanelStyle}">
+                <StackPanel>
+                    <TextBlock Text="Unit Converter" Style="{StaticResource HeaderStyle}"/>
+
+                    <TextBlock Text="Value" Style="{StaticResource LabelStyle}"/>
+                    <TextBox Text="{Binding InputValue, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,5"/>
+
+                    <TextBlock Text="From Unit" Style="{StaticResource LabelStyle}"/>
+                    <ComboBox ItemsSource="{Binding LengthUnits}"
+                              SelectedItem="{Binding SelectedFromUnit}"
+                              Margin="0,0,0,5"/>
+
+                    <TextBlock Text="To Unit" Style="{StaticResource LabelStyle}"/>
+                    <ComboBox ItemsSource="{Binding LengthUnits}"
+                              SelectedItem="{Binding SelectedToUnit}"
+                              Margin="0,0,0,10"/>
+
+                    <Button Content="Convert" Command="{Binding ConvertUnitCommand}"
+                            Margin="0,0,0,15"/>
+
+                    <Border Background="{StaticResource BackgroundBrush}"
+                            CornerRadius="3" Padding="10">
+                        <StackPanel>
+                            <TextBlock Text="Result" Style="{StaticResource LabelStyle}"/>
+                            <TextBlock Text="{Binding ConvertedValue, StringFormat={}{0:F4}}"
+                                       FontSize="20" FontWeight="Bold"
+                                       Foreground="{StaticResource AccentBrush}"
+                                       FontFamily="Consolas"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Common Conversions" Style="{StaticResource LabelStyle}"
+                               Margin="0,15,0,5"/>
+                    <TextBlock Text="1 ft = 0.3048 m" Style="{StaticResource ValueStyle}"/>
+                    <TextBlock Text="1 nm = 1852 m" Style="{StaticResource ValueStyle}"/>
+                    <TextBlock Text="1 km = 3280.84 ft" Style="{StaticResource ValueStyle}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Bottom Row: Charts -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Temperature Chart -->
+            <Border Grid.Column="0" Style="{StaticResource PanelStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Temperature vs Altitude"
+                               Style="{StaticResource HeaderStyle}"/>
+
+                    <lvc:CartesianChart Grid.Row="1"
+                                        Series="{Binding TemperatureSeries}"
+                                        XAxes="{Binding AltitudeAxis}"
+                                        YAxes="{Binding TemperatureAxis}"/>
+                </Grid>
+            </Border>
+
+            <!-- Pressure Chart -->
+            <Border Grid.Column="1" Style="{StaticResource PanelStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Pressure vs Altitude"
+                               Style="{StaticResource HeaderStyle}"/>
+
+                    <lvc:CartesianChart Grid.Row="1"
+                                        Series="{Binding PressureSeries}"
+                                        XAxes="{Binding AltitudeAxis}"
+                                        YAxes="{Binding PressureAxis}"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
